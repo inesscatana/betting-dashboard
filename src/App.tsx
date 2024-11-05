@@ -7,6 +7,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from './store'
 import { setGames, openBetModal } from './store/slices/betSlice'
 import { Game } from './types'
+import { ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 const BetModal = lazy(() => import('./components/BetModal'))
 
@@ -16,6 +18,7 @@ const App: React.FC = () => {
 		modalOpen,
 		selectedGameId,
 		games: storedGames,
+		bets,
 	} = useSelector((state: RootState) => state.bet)
 	const [selectedSport, setSelectedSport] = useState<string>('soccer')
 	const [page, setPage] = useState<number>(1)
@@ -77,6 +80,7 @@ const App: React.FC = () => {
 			/>
 			<Dashboard
 				games={storedGames}
+				bets={bets}
 				isLoading={isLoading}
 				onCardClick={handleOpenBetModal}
 			/>
@@ -85,6 +89,7 @@ const App: React.FC = () => {
 					<BetModal gameId={selectedGameId} teams={selectedTeams} />
 				)}
 			</Suspense>
+			<ToastContainer position="top-right" autoClose={3000} hideProgressBar />
 		</div>
 	)
 }

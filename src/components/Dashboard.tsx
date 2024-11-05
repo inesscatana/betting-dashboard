@@ -17,12 +17,14 @@ const LoadingMessage = styled.div`
 
 interface DashboardProps {
 	games: Game[]
+	bets: { [gameId: string]: { [team: string]: number } }
 	isLoading: boolean
 	onCardClick: (game: Game) => void
 }
 
 const Dashboard: React.FC<DashboardProps> = ({
 	games,
+	bets,
 	isLoading,
 	onCardClick,
 }) => {
@@ -31,7 +33,12 @@ const Dashboard: React.FC<DashboardProps> = ({
 	return (
 		<DashboardContainer>
 			{games.map((game) => (
-				<GameCard key={game.id} game={game} onClick={() => onCardClick(game)} />
+				<GameCard
+					key={game.id}
+					game={game}
+					bets={bets}
+					onClick={() => onCardClick(game)}
+				/>
 			))}
 		</DashboardContainer>
 	)

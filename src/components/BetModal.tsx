@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import styled from 'styled-components'
 import { useDispatch } from 'react-redux'
 import { placeBet, closeBetModal } from '../store/slices/betSlice'
+import { toast } from 'react-toastify'
 
 const ModalContainer = styled.div`
 	position: fixed;
@@ -38,6 +39,8 @@ const FormControl = styled.div`
 	flex-direction: column;
 	gap: 1rem;
 	width: 100%;
+	max-width: 300px;
+	margin: 0 auto 1.5rem auto;
 `
 
 const Select = styled.select`
@@ -70,7 +73,8 @@ const ButtonGroup = styled.div`
 	gap: 1rem;
 	justify-content: center;
 	width: 100%;
-	margin-top: 1rem;
+	max-width: 300px;
+	margin: 0 auto;
 `
 
 const Button = styled.button<{ $primary?: boolean }>`
@@ -99,15 +103,19 @@ interface BetModalProps {
 const BetModal: React.FC<BetModalProps> = ({ gameId, teams }) => {
 	const [team, setTeam] = useState('')
 	const [amount, setAmount] = useState<number>(0)
+	const [isSubmitting, setIsSubmitting] = useState(false)
 	const dispatch = useDispatch()
 
 	const handleBet = () => {
 		if (team && amount > 0) {
 			// console.log('Dispatching placeBet:', { gameId, team, amount })
+			setIsSubmitting(true)
 			dispatch(placeBet({ gameId, team, amount }))
 			dispatch(closeBetModal())
+			setIsSubmitting(false)
+			toast.success('Bet registered successfully!')
 		} else {
-			alert('Please select a team and enter a valid amount.')
+			toast.error('Please select a team and enter a valid amount.')
 		}
 	}
 
@@ -132,7 +140,7 @@ const BetModal: React.FC<BetModalProps> = ({ gameId, teams }) => {
 				</FormControl>
 				<ButtonGroup>
 					<Button $primary onClick={handleBet}>
-						Submit Bet
+						{isSubmitting ? 'Betting...' : 'Submit Bet'}
 					</Button>
 					<Button onClick={() => dispatch(closeBetModal())}>Cancel</Button>
 				</ButtonGroup>
