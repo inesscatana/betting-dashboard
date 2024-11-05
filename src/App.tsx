@@ -5,7 +5,7 @@ import Filter from './components/Filter'
 import Dashboard from './components/Dashboard'
 import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from './store'
-import { setGames } from './store/slices/betSlice'
+import { setGames, openBetModal } from './store/slices/betSlice'
 import { Game } from './types'
 
 const BetModal = lazy(() => import('./components/BetModal'))
@@ -19,6 +19,10 @@ const App: React.FC = () => {
 	} = useSelector((state: RootState) => state.bet)
 	const [selectedSport, setSelectedSport] = useState<string>('soccer')
 	const [page, setPage] = useState<number>(1)
+	const [selectedTeams, setSelectedTeams] = useState<{
+		home: string
+		away: string
+	} | null>(null)
 
 	// Fetch odds data with React Query
 	const { isLoading } = useQuery(
@@ -54,6 +58,12 @@ const App: React.FC = () => {
 		setPage(1) // Reset page for new sport
 	}
 
+	// Open the modal and set selected teams for the clicked game
+	const handleOpenBetModal = (game: Game) => {
+		setSelectedTeams({ home: game.home_team, away: game.away_team })
+		dispatch(openBetModal(game.id))
+	}
+
 	useEffect(() => {
 		window.addEventListener('scroll', handleScroll)
 		return () => window.removeEventListener('scroll', handleScroll)
@@ -65,9 +75,15 @@ const App: React.FC = () => {
 				selectedSport={selectedSport}
 				onFilterChange={handleFilterChange}
 			/>
-			<Dashboard games={storedGames} isLoading={isLoading} />
+			<Dashboard
+				games={storedGames}
+				isLoading={isLoading}
+				onCardClick={handleOpenBetModal}
+			/>
 			<Suspense fallback={<div>Loading modal...</div>}>
-				{modalOpen && selectedGameId && <BetModal gameId={selectedGameId} />}
+				{modalOpen && selectedGameId && selectedTeams && (
+					<BetModal gameId={selectedGameId} teams={selectedTeams} />
+				)}
 			</Suspense>
 		</div>
 	)

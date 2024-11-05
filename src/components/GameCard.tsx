@@ -1,9 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
-import { useDispatch } from 'react-redux'
-import { openBetModal } from '../store/slices/betSlice'
 import { Game } from '../types'
-import { AppDispatch } from '../store'
 
 const Card = styled.div`
 	padding: 1.5rem;
@@ -16,6 +13,7 @@ const Card = styled.div`
 	align-items: center;
 	font-family: 'Poppins', sans-serif;
 	transition: transform 0.2s;
+	cursor: pointer;
 
 	&:hover {
 		transform: scale(1.03);
@@ -54,15 +52,14 @@ const BetButton = styled.button`
 	}
 `
 
-const GameCard: React.FC<{ game: Game }> = React.memo(({ game }) => {
-	const dispatch = useDispatch<AppDispatch>()
+interface GameCardProps {
+	game: Game
+	onClick: () => void
+}
 
-	const handlePlaceBet = () => {
-		dispatch(openBetModal(game.id))
-	}
-
+const GameCard: React.FC<GameCardProps> = React.memo(({ game, onClick }) => {
 	return (
-		<Card>
+		<Card onClick={onClick}>
 			<TeamName>
 				{game.home_team} vs {game.away_team}
 			</TeamName>
@@ -72,7 +69,14 @@ const GameCard: React.FC<{ game: Game }> = React.memo(({ game }) => {
 			<OddsText>
 				Away: {game.bookmakers[0]?.markets[0]?.outcomes[1]?.price ?? 'N/A'}
 			</OddsText>
-			<BetButton onClick={handlePlaceBet}>Place a Bet</BetButton>
+			<BetButton
+				onClick={(e) => {
+					e.stopPropagation()
+					onClick()
+				}}
+			>
+				Place a Bet
+			</BetButton>
 		</Card>
 	)
 })

@@ -5,11 +5,13 @@ interface BetState {
 	games: Game[]
 	modalOpen: boolean
 	selectedGameId?: string
+	bets: { [gameId: string]: { [team: string]: number } }
 }
 
 const initialState: BetState = {
 	games: [],
 	modalOpen: false,
+	bets: {},
 }
 
 const betSlice = createSlice({
@@ -18,6 +20,9 @@ const betSlice = createSlice({
 	reducers: {
 		setGames(state, action: PayloadAction<Game[]>) {
 			state.games = action.payload
+			action.payload.forEach((game) => {
+				state.bets[game.id] = { [game.home_team]: 0, [game.away_team]: 0 }
+			})
 		},
 		openBetModal(state, action: PayloadAction<string>) {
 			state.modalOpen = true
@@ -31,9 +36,11 @@ const betSlice = createSlice({
 			state,
 			action: PayloadAction<{ gameId: string; team: string; amount: number }>
 		) {
-			const game = state.games.find((g) => g.id === action.payload.gameId)
-			if (game) {
-				game.bets[action.payload.team] += 1 // Increment simulated bet count
+			const { gameId, team } = action.payload
+			if (!state.bets[gameId]) {
+				state.bets[gameId] = { [team]: 1 }
+			} else {
+				state.bets[gameId][team] = (state.bets[gameId][team] || 0) + 1
 			}
 		},
 	},

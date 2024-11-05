@@ -18,15 +18,20 @@ const LoadingMessage = styled.div`
 interface DashboardProps {
 	games: Game[]
 	isLoading: boolean
+	onCardClick: (game: Game) => void
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ games, isLoading }) => {
+const Dashboard: React.FC<DashboardProps> = ({
+	games,
+	isLoading,
+	onCardClick,
+}) => {
 	if (isLoading) return <LoadingMessage>Loading...</LoadingMessage>
 
 	return (
 		<DashboardContainer>
 			{games.map((game) => (
-				<GameCard key={game.id} game={game} />
+				<GameCard key={game.id} game={game} onClick={() => onCardClick(game)} />
 			))}
 		</DashboardContainer>
 	)
