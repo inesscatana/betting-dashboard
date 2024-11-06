@@ -19,9 +19,10 @@ const betSlice = createSlice({
 	initialState,
 	reducers: {
 		setGames(state, action: PayloadAction<Game[]>) {
-			state.games = action.payload
+			const games = action.payload || []
+			state.games = games
 
-			action.payload.forEach((game) => {
+			games.forEach((game) => {
 				if (!state.bets[game.id]) {
 					state.bets[game.id] = {
 						[game.home_team]: 0,
@@ -30,6 +31,7 @@ const betSlice = createSlice({
 				}
 			})
 		},
+
 		openBetModal(state, action: PayloadAction<string>) {
 			state.modalOpen = true
 			state.selectedGameId = action.payload

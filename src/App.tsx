@@ -1,5 +1,5 @@
 import React, { useState, lazy, Suspense, useEffect } from 'react'
-import { useQuery } from 'react-query'
+import { useQuery, useQueryClient } from 'react-query'
 import { getOdds } from './services/oddsApi'
 import Filter from './components/Filter'
 import Dashboard from './components/Dashboard'
@@ -14,6 +14,7 @@ const BetModal = lazy(() => import('./components/BetModal'))
 
 const App: React.FC = () => {
 	const dispatch = useDispatch()
+	const queryClient = useQueryClient()
 	const {
 		modalOpen,
 		selectedGameId,
@@ -27,6 +28,11 @@ const App: React.FC = () => {
 		away: string
 	} | null>(null)
 
+	useEffect(() => {
+		setPage(1)
+		queryClient.invalidateQueries(['odds', selectedSport])
+	}, [selectedSport, queryClient])
+
 	// Fetch odds data with React Query
 	const { isLoading } = useQuery(
 		['odds', selectedSport, page],
@@ -36,10 +42,12 @@ const App: React.FC = () => {
 			staleTime: 60000,
 			refetchOnWindowFocus: false,
 			onSuccess: (data: Game[]) => {
-				if (page === 1) {
-					dispatch(setGames(data))
-				} else {
-					dispatch(setGames([...storedGames, ...data]))
+				if (data && data.length > 0) {
+					if (page === 1) {
+						dispatch(setGames(data))
+					} else {
+						dispatch(setGames([...storedGames, ...data]))
+					}
 				}
 			},
 		}
@@ -58,7 +66,6 @@ const App: React.FC = () => {
 	// Reset page when changing sport filter
 	const handleFilterChange = (sport: string) => {
 		setSelectedSport(sport)
-		setPage(1) // Reset page for new sport
 	}
 
 	// Open the modal and set selected teams for the clicked game
@@ -83,6 +90,7 @@ const App: React.FC = () => {
 				bets={bets}
 				isLoading={isLoading}
 				onCardClick={handleOpenBetModal}
+				selectedSport={selectedSport}
 			/>
 			<Suspense fallback={<div>Loading modal...</div>}>
 				{modalOpen && selectedGameId && selectedTeams && (

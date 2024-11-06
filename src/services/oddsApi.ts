@@ -16,6 +16,6 @@ export const getOdds = async (sport: string) => {
 		return response.data
 	} catch (error) {
 		console.error('Error fetching odds:', error)
-		return null
+		return []
 	}
 }

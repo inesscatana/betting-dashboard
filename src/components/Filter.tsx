@@ -34,14 +34,13 @@ interface FilterProps {
 }
 
 const sportsMap: { [key: string]: string } = {
-	All: 'soccer',
 	Soccer: 'soccer',
 	Basketball: 'basketball_nba',
 	MMA: 'mma_mixed_martial_arts',
 }
 
 const Filter: React.FC<FilterProps> = ({ selectedSport, onFilterChange }) => {
-	const sports = ['All', 'Soccer', 'Basketball', 'MMA']
+	const sports = ['Soccer', 'Basketball', 'MMA']
 
 	return (
 		<FilterContainer>
@@ -49,7 +48,11 @@ const Filter: React.FC<FilterProps> = ({ selectedSport, onFilterChange }) => {
 				<FilterButton
 					key={sport}
 					$isActive={selectedSport === sportsMap[sport]}
-					onClick={() => onFilterChange(sportsMap[sport])}
+					onClick={() => {
+						if (selectedSport !== sportsMap[sport]) {
+							onFilterChange(sportsMap[sport])
+						}
+					}}
 				>
 					{sport}
 				</FilterButton>
