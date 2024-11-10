@@ -44,9 +44,7 @@ This is a web application that provides betting information for various sports g
    VITE_ODDS_API_KEY=your_api_key_here
    ```
 
-4. **Set up environment variables**
-
-   Start the development server
+4. **Start the development server**
 
    ```bash
    npm run dev
